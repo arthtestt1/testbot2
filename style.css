@@ -1,6 +1,0 @@
-body {
-    height: 50vh; /* 50% of the viewport height */
-    max-height: 50vh;
-    overflow-y: auto;
-    margin: 0;
-}
